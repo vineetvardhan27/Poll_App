@@ -11,16 +11,26 @@ dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
+
+// Configure allowed origins (development + production)
+const allowedOrigins = [
+  "http://localhost:5173",                    // Local development
+  "http://localhost:3000",                    // Alternative local port
+  process.env.CLIENT_URL                       // Production Vercel URL
+].filter(Boolean); // Remove undefined values
+
+// Socket.IO with CORS
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
-// Middleware
+// Express CORS Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:5173",
+  origin: allowedOrigins,
   methods: ["GET", "POST"],
   credentials: true
 }));
